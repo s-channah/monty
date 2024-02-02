@@ -58,6 +58,7 @@ void push(stack_t **head, unsigned int line_number)
 	int value;
 	stack_t *new_top;
 
+
 	token = strtok(NULL, " \t\r\n");
 
 	if (token == NULL || !(isdigit_on_str(token)))
@@ -66,17 +67,23 @@ void push(stack_t **head, unsigned int line_number)
 		exit(EXIT_FAILURE);
 	}
 
-	value = atoi(token);
-	if (*head == NULL)
+	value = strtol(token, NULL, 10);
+	if (value == 0 && token[0] != '0')
 	{
-		*head = new_node(value);
-		return;
+		fprintf(stderr, "L%u: invalid integer format\n", line_number);
+		exit(EXIT_FAILURE);
 	}
-
 	new_top = new_node(value);
-	new_top->next = *head;
-	(*head)->prev = new_top;
-
+	if (new_top == NULL)
+	{
+		fprintf(stderr, "L%u: memory allocation failed\n", line_number);
+		exit(EXIT_FAILURE);
+	}
+	if (*head != NULL)
+	{
+		new_top->next = *head;
+		(*head)->prev = new_top;
+	}
 	*head = new_top;
 }
 
@@ -99,13 +106,14 @@ void pall(stack_t **head, unsigned int __attribute__((unused)) line_number)
 	}
 }
 
+
 /**
  * pint - prints the value at the top of the stack
  * @head: head pointer.
  * @line_number: the line number read.
  */
 
-void pint(stack_t **head, unsigned int __attribute__((unused)) line_number)
+void pint(stack_t **head, unsigned int line_number)
 {
 	if (*head == NULL)
 	{
